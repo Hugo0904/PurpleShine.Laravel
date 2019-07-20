@@ -275,7 +275,7 @@ trait QueryTrait
             if ($count++ > 0) $boolean = 'and';
 
             if (is_array($value) && count($value) == 3 && in_array($value[1], $operators)) {
-                list($field, $condition, $val) = $value;
+                [$field, $condition, $val] = $value;
                 $this->executeQuery($query, 'where', $boolean, $field, $condition, $val);
             } else if (is_array($value)) {
                 $this->executeQuery($query, 'whereIn', $boolean, $field, $value);

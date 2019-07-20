@@ -442,7 +442,7 @@ class Querent implements ArrayAccess
     {
         // 填充日期區間
         if ($this->canFillQuery('time_range')) {
-            list($timeColumn, $beginAt, $endAt) = $this->time_range;
+            [$timeColumn, $beginAt, $endAt] = $this->time_range;
             $timeColumn = $this->getMappingColumn($this->query, $timeColumn);
             $this->selectTimeRange($this->query, $beginAt, $endAt, $timeColumn);
         }

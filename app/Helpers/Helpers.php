@@ -1,12 +1,12 @@
 <?php
 
-if (! function_exists('pkcs5Pad')) {
+if (! function_exists('pkcs5_pad')) {
     /**
      * @param string $text
      * @param int $blockSize
      * @return string
      */
-    function pkcs5Pad(string $text, int $blockSize): string
+    function pkcs5_pad(string $text, int $blockSize): string
     {
         $pad = $blockSize - (strlen($text) % $blockSize);
 
@@ -14,12 +14,12 @@ if (! function_exists('pkcs5Pad')) {
     }
 }
 
-if (! function_exists('pkcs5Unpad')) {
+if (! function_exists('pkcs5_unpad')) {
     /**
      * @param string $text
      * @return string
      */
-    function pkcs5Unpad(string $text): string
+    function pkcs5_unpad(string $text): string
     {
         $pad = ord($text{strlen($text) - 1});
 
@@ -34,12 +34,12 @@ if (! function_exists('pkcs5Unpad')) {
     }
 }
 
-if (! function_exists('hashCode64')) {
+if (! function_exists('hashcode64')) {
     /**
      * @param $str
      * @return int
      */
-    function hashCode64($str)
+    function hashcode64($str)
     {
         $str = (string)$str;
         $hash = 0;
@@ -58,12 +58,12 @@ if (! function_exists('hashCode64')) {
     }
 }
 
-if (! function_exists('hashCode32')) {
+if (! function_exists('hashcode32')) {
     /**
      * @param $s
      * @return int
      */
-    function hashCode32( $s )
+    function hashcode32( $s )
     {
         $h = 0;
         $len = strlen($s);

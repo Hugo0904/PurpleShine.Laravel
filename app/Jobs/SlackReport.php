@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use LERN;
 use Log;
 
 use Illuminate\Support\Facades\Redis;

@@ -2,8 +2,6 @@
 
 namespace App\Jobs;
 
-use Log;
-
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

@@ -16,3 +16,7 @@ mix.js('resources/js/app.js', 'public/js')
     .copy('node_modules/admin-lte/plugins/iCheck/square/*.png', 'public/build/css')
     .copy('node_modules/admin-lte/dist/img/**.*', 'public/images/admin-lte')
     .copy('node_modules/font-awesome/fonts', 'public/fonts');
+
+if (mix.inProduction()) {
+    mix.version();
+}

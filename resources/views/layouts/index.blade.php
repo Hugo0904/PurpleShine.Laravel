@@ -8,7 +8,8 @@
         </title>
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <meta name="robots" content="noindex, nofollow">
-        <link rel="stylesheet" href="{{ elixir('css/app.css') }}">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="stylesheet" href="{{ mix('css/app.css') }}">
         @yield('style')
         <script>
          window.Laravel = <?php echo json_encode([
@@ -32,7 +33,7 @@
         <div id="js-lang-another_login" class="hidden">{{trans('auth.another_login')}}</div>
 
 
-            <script src="{{ elixir('js/app.js') }}"></script>
+            <script src="{{ mix('js/app.js') }}"></script>
             {{--<script src="{{ asset("/js/index.js") }}?v={{time()}}"></script>--}}
 
             @yield('script')

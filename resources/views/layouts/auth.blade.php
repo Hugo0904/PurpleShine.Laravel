@@ -9,7 +9,7 @@
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <meta name="robots" content="noindex, nofollow">
 
-        <link rel="stylesheet" href="{{ elixir('css/app.css') }}">
+        <link rel="stylesheet" href="{{ mix('css/app.css') }}">
         @yield('style')
     </head>
     <body class="hold-transition login-page">
@@ -19,7 +19,7 @@
 
         </div>
 
-        <script src="{{ elixir('js/app.js') }}"></script>
+        <script src="{{ mix('js/app.js') }}"></script>
         @yield('script')
     </body>
 </html>

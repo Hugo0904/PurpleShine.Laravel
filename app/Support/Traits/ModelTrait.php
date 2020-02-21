@@ -6,10 +6,15 @@
  * Time: 下午5:23
  */
 
-namespace App\Traits;
+namespace App\Support\Traits;
 
 use Carbon\Carbon;
 
+/**
+ * Trait ModelTrait
+ *
+ * @package App\Support\Traits
+ */
 trait ModelTrait
 {
     /**

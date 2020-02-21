@@ -1,5 +1,38 @@
 <?php
 
+use Jenssegers\Agent\Agent;
+
+if (! function_exists('print_exception')) {
+    /**
+     * 輸出例外
+     *
+     * @param Throwable $e
+     * @param bool $trace
+     * @return string
+     */
+    function print_exception(Throwable $e, bool $trace = false)
+    {
+        $url = \Request::url();
+        $method = \Request::method();
+        $message = 'Time: ' . \Carbon\Carbon::now()->toDateTimeString() . PHP_EOL . "URL: {$method}@{$url}" . PHP_EOL . 'Message: ';
+
+        if (! $trace) {
+            return $message . $e->getMessage();
+        }
+
+        $previousText = '';
+        if ($previous = $e->getPrevious()) {
+            do {
+                $previousText .= sprintf(', %s(code: %s): %s at %s:%s', get_class($previous), $previous->getCode(), $previous->getMessage(), $previous->getFile(), $previous->getLine());
+            } while ($previous = $previous->getPrevious());
+        }
+
+        $str = sprintf('[object] (%s(code: %s): %s at %s:%s%s)', get_class($e), $e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine(), $previousText);
+
+        return $message . $str;
+    }
+}
+
 if (! function_exists('pkcs5_pad')) {
     /**
      * @param string $text
@@ -186,12 +219,26 @@ if (! function_exists('is_cross_hour')) {
     }
 }
 
+if (! function_exists('decimals_amount')) {
+    /**
+     * 將金額精確到小數點
+     *
+     * @param int $amount
+     * @param int $decimals
+     * @return string
+     */
+    function decimals_amount($amount = 0, int $decimals = 2): string
+    {
+        return number_format($amount, $decimals, ".", ",");
+    }
+}
+
 if (! function_exists('parse_bool')) {
     /**
      * @param $value
      * @return bool
      */
-    function parse_bool($value): bool
+    function parse_bool($value)
     {
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
@@ -202,7 +249,7 @@ if (! function_exists('parse_int')) {
      * @param $value
      * @return int
      */
-    function parse_int($value): int
+    function parse_int($value)
     {
         return filter_var($value, FILTER_VALIDATE_INT);
     }
@@ -213,8 +260,59 @@ if (! function_exists('parse_float')) {
      * @param $value
      * @return float
      */
-    function parse_float($value): float
+    function parse_float($value)
     {
         return filter_var($value, FILTER_VALIDATE_FLOAT);
+    }
+}
+
+if (! function_exists('floor_dec')) {
+
+    /**
+     * @param $value
+     * @param $precision
+     * @return float|int
+     */
+    function floor_dec($value, $precision = 2)
+    {
+        $tempMagnification = pow(10, $precision);
+        $value = $value * $tempMagnification;
+        return floor((string)$value) / $tempMagnification;
+    }
+}
+
+if (! function_exists('device_info')) {
+
+    /**
+     * @return array
+     */
+    function device_info()
+    {
+        $agent = new Agent();
+        $browser = $agent->browser();
+        $platform = $agent->platform();
+
+        return [
+            'type' => $agent->device(),
+            'platform' => [
+                'name' => $platform,
+                'version' => $agent->version($platform)
+            ],
+            'browser' => [
+                'name' => $browser,
+                'version' => $agent->version($browser)
+            ]
+        ];
+    }
+}
+
+if (! function_exists('is_json')) {
+
+    /**
+     * @param $string
+     * @return bool
+     */
+    function is_json($string){
+        return is_string($string) && is_array(json_decode($string, true)) && (json_last_error() == JSON_ERROR_NONE);
     }
 }

@@ -17,8 +17,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\{Model, Builder};
 use Prettus\Repository\Eloquent\BaseRepository;
 
-use App\Traits\QueryTrait;
-use App\Traits\RepositoryExtendTrait;
+use App\Support\Traits\QueryTrait;
 
 /**
  * Class Querent
@@ -88,7 +87,7 @@ class Querent implements ArrayAccess
     }
 
     /**
-     * @var Model|BaseRepository|RepositoryExtendTrait
+     * @var Model|BaseRepository
      */
     protected $model;
 
@@ -211,20 +210,8 @@ class Querent implements ArrayAccess
 
         if (static::isEloquent($model)) {
             // use model
-            if (($model instanceof Model || $model instanceof BaseRepository) && (! isset($this->model) || ! ($this->model instanceof $model))) {
-                if ($model instanceof Model) {
-                    $this->model = $model;
-                } else {
-                    $needMethod = ['getModel', 'setModel'];
-                    if (! (in_array(RepositoryExtendTrait::class, class_uses($model)) ||
-                        (method_exists($model, $needMethod[0]) && method_exists($model, $needMethod[1]))))
-                    {
-                        throw new \ReflectionException(get_class($model) . ' must use RepositoryExtendTrait or have getModel and setModel method');
-                    }
-
-                    $this->model = $model;
-                }
-
+            if ($model instanceof Model && ! isset($this->model)) {
+                $this->model = $model;
                 $this->reset();
             }
             // use builder

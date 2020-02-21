@@ -6,7 +6,7 @@
  * Time: 上午12:29
  */
 
-namespace App\Traits;
+namespace App\Support\Traits;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -22,7 +22,7 @@ use Carbon\Carbon;
  * Query的集合
  * 1. 可以配合Criteria使用
  *
- * @package App\Traits
+ * @package App\Support\Traits
  */
 trait QueryTrait
 {

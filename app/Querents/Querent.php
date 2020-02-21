@@ -29,18 +29,11 @@ use App\Traits\RepositoryExtendTrait;
  * 可同時使用Repository or Eloquent 做完查詢的庫
  *
  * @package App\Querents
+ * @method static $this from($model)
  * @method static $this setModel($model)
- * @method $this selectUser($user)
- * @method $this orSelectUser($user)
- * @method $this selectUnderFistLevel($user)
- * @method $this selectUserUnder($user)
- * @method $this orSelectUserUnder($user)
- * @method $this selectSpecificUnder($user, $SpecificClass)
- * @method $this orSelectSpecificUnder($user, $SpecificClass)
- * @method $this selectFirstUnder($user)
- * @method $this orSelectFirstUnder($user)
- * @method $this selectUserOrUnder($user)
- * @method $this orSelectUserOrUnder($user)
+ * @method static $this setQuery($query)
+ * @method static $this setSubQuery($subQuery)
+ * @method static $this fromSubQuery($subQuery)
  * @method $this selectTimeRange($beginAt, $endAt, $timeColumn = 'created_at')
  * @method $this orSelectTimeRange($beginAt, $endAt, $timeColumn = 'created_at')
  * @method $this selectPartition($beginAt, $endAt)
@@ -182,16 +175,21 @@ class Querent implements ArrayAccess
     public function reset(bool $force = false)
     {
         if ($this->model instanceof Model) {
-            $this->query = $this->convertBuilder($this->model);
+            $model = $this->model;
         } elseif ($this->model instanceof BaseRepository) {
             if ($force) {
                 $this->model->resetCriteria()->resetScope();
             }
             $this->model->resetModel();
             $model = $this->model->getModel();
+        }
+
+        if (isset($model)) {
             $this->query = $this->convertBuilder($model);
+            $this->coreQuery = $this->query->getQuery();
         } else {
             $this->query = null;
+            $this->coreQuery = null;
         }
 
         return $this;
@@ -200,8 +198,9 @@ class Querent implements ArrayAccess
     /**
      * 設置模組
      *
-     * @param string|Model|BaseRepository|Builder $model 模組
+     * @param $model
      * @return $this
+     * @throws \Prettus\Repository\Exceptions\RepositoryException
      * @throws \ReflectionException
      */
     protected function table($model)
@@ -224,11 +223,9 @@ class Querent implements ArrayAccess
                     }
 
                     $this->model = $model;
-                    $model = $this->model->getModel();
                 }
 
-                $this->query = $this->convertBuilder($model);
-                $this->coreQuery = $this->query->getQuery();
+                $this->reset();
             }
             // use builder
             elseif ($model instanceof Builder && $this->query !== $model) {
@@ -258,7 +255,7 @@ class Querent implements ArrayAccess
      *
      * @return Builder
      */
-    protected function getQuery(): Builder
+    public function getQuery()
     {
         return $this->query;
     }
@@ -266,11 +263,11 @@ class Querent implements ArrayAccess
     /**
      * 取得內部查詢器
      *
-     * @return Builder
+     * @return QueryBuilder
      */
-    protected function getCoreQuery(): QueryBuilder
+    public function getCoreQuery()
     {
-        return $this->query;
+        return $this->coreQuery;
     }
 
     /**
@@ -354,7 +351,7 @@ class Querent implements ArrayAccess
     {
         $value = $mapping[$key] ?? $key;
 
-        if ($autoCheckMethod && method_exists($this, $value)) {
+        if ($autoCheckMethod && is_string($value) && method_exists($this, $value)) {
             return $this->{$value}();
         }
 
@@ -400,6 +397,17 @@ class Querent implements ArrayAccess
     public function getAttribute($field, $default = null)
     {
         return $this->attributes[$field] ?? $default;
+    }
+
+    /**
+     * 判斷設置在Querent內的參考條件是否該key
+     *
+     * @param $field
+     * @return boolean
+     */
+    public function hasAttribute($field)
+    {
+        return isset($this->attributes[$field]);
     }
 
     /**
@@ -529,14 +537,19 @@ class Querent implements ArrayAccess
         }
 
         // \Illuminate\Database\Query\Builder
-        if (method_exists($this->query, $method)) {
+        if (method_exists($this->query, $method) || (isset($this->query) && ! is_null($this->query->getMacro($method)))) {
             $result = $this->query->{$method}(...$arguments);
             return static::isQueryBuilder($result) ? $this : $this->disposeIfResult($method, $result);
         }
 
         // \Illuminate\Database\Query
-        if (method_exists($this->coreQuery, $method)) {
-            $result = isset($this->query) ? $this->query->{$method}(...$arguments) : $this->coreQuery->{$method}(...$arguments);
+        if (method_exists($this->coreQuery, $method) || ($userMacro = $this->coreQuery->hasMacro($method))) {
+            if (! isset($this->query) || isset($userMacro) && $userMacro) {
+                $result = $this->coreQuery->{$method}(...$arguments);
+            } else {
+                $result = $this->query->{$method}(...$arguments);
+            }
+
             return static::isQueryBuilder($result) ? $this : $this->disposeIfResult($method, $result);
         }
 
@@ -575,9 +588,13 @@ class Querent implements ArrayAccess
     public static function __callStatic($method, $arguments)
     {
         switch ($method) {
+            case 'table':
+            case 'from':
             case 'setModel':
-                $querent = static::build();
-                return $querent->table(...$arguments);
+            case 'setQuery':
+            case 'setSubQuery':
+            case 'fromSubQuery':
+                return static::build(...$arguments);
 
             default:
                 break;

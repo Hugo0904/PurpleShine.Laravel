@@ -16,12 +16,11 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 
 use Carbon\Carbon;
 
-use App\Models\User;
-
 /**
  * Trait QueryTrait
  *
  * Query的集合
+ * 1. 可以配合Criteria使用
  *
  * @package App\Traits
  */
@@ -88,7 +87,6 @@ trait QueryTrait
             throw new \ReflectionException('Must be Model or Builder');
         }
     }
-
 
     /**
      * 選擇時間Range
@@ -275,9 +273,13 @@ trait QueryTrait
             if ($count++ > 0) $boolean = 'and';
 
             if (is_array($value) && count($value) == 3 && in_array($value[1], $operators)) {
-                [$field, $condition, $val] = $value;
-                $this->executeQuery($query, 'where', $boolean, $field, $condition, $val);
-            } else if (is_array($value)) {
+                list($field, $condition, $val) = $value;
+                if (is_array($val) || $val instanceof Collection) {
+                    $this->executeQuery($query, 'whereNotIn', $boolean, $field, $val);
+                } else {
+                    $this->executeQuery($query, 'where', $boolean, $field, $condition, $val);
+                }
+            } else if (is_array($value) || $value instanceof Collection) {
                 $this->executeQuery($query, 'whereIn', $boolean, $field, $value);
             } else {
                 $this->executeQuery($query, 'where', $boolean, $field, $value);

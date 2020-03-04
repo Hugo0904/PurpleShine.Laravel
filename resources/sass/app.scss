@@ -8,6 +8,9 @@
 //@import '~bootstrap/scss/bootstrap';
 //@import '~bootstrap/dist/css/bootstrap.css';
 
+// Other
+@import '~select2/dist/css/select2.min.css';
+
 // Modules
 // AdminLTE
 @import "~admin-lte/plugins/iCheck/all.css";
@@ -20,9 +23,6 @@
 @import '~admin-lte/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css';
 @import "~admin-lte/dist/css/skins/_all-skins.min.css";
 @import "~admin-lte/dist/css/AdminLTE.min.css";
-
-// Other
-@import '~select2/dist/css/select2.min.css';
 
 // Custom
 @import "lang";

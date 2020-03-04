@@ -7,6 +7,7 @@
 require('./bootstrap');
 require('./adminlte');
 require('select2/dist/js/select2.js');
+require('sweetalert/dist/sweetalert.min.js');
 
 window.Vue = require('vue');
 

@@ -15,7 +15,6 @@ use ArrayAccess;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\{Model, Builder};
-use Prettus\Repository\Eloquent\BaseRepository;
 
 use App\Support\Traits\QueryTrait;
 
@@ -87,7 +86,7 @@ class Querent implements ArrayAccess
     }
 
     /**
-     * @var Model|BaseRepository
+     * @var Model
      */
     protected $model;
 
@@ -175,12 +174,6 @@ class Querent implements ArrayAccess
     {
         if ($this->model instanceof Model) {
             $model = $this->model;
-        } elseif ($this->model instanceof BaseRepository) {
-            if ($force) {
-                $this->model->resetCriteria()->resetScope();
-            }
-            $this->model->resetModel();
-            $model = $this->model->getModel();
         }
 
         if (isset($model)) {
@@ -514,13 +507,6 @@ class Querent implements ArrayAccess
             }
             $this->skipRelation = [];
             $this->autoFillQuery = true;
-        }
-
-        // call repository method
-        if ($this->model instanceof BaseRepository && method_exists($this->model, $method)) {
-            $this->model->setModel($this->query);
-            $result = $this->model->{$method}(...$arguments);
-            return $result instanceof BaseRepository ? $this : $this->disposeIfResult($method, $result);
         }
 
         // \Illuminate\Database\Query\Builder

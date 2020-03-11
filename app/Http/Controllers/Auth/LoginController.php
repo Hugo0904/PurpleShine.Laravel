@@ -62,7 +62,6 @@ class LoginController extends Controller
         }
 
         if ($this->attemptLogin($request)) {
-            Redis::hset('user:auth_token', \Auth::id(), csrf_token());
             return $this->sendLoginResponse($request);
         }
 
